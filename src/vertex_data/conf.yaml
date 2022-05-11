@@ -1,0 +1,9 @@
+app:
+- algo: vertex_data_hello
+  type: cpp_pie
+  class_name: gs::Hello
+  src: hello.h
+  context_type: vertex_data
+  compatible_graph:
+    - gs::ArrowProjectedFragment
+    - gs::DynamicProjectedFragment

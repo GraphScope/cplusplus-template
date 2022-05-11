@@ -1,6 +1,8 @@
 project(cplusplus_application_example C CXX)
 cmake_minimum_required(VERSION 3.5)
 
+option(BUILD_GAR "Package application as graphscope-recognized resource" ON)
+
 include(GNUInstallDirs)
 include(CheckCXXCompilerFlag)
 
@@ -125,14 +127,24 @@ if (APPLE AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	set(CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS "${CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS} -undefined dynamic_lookup")
 endif()
 
-# TODO Add library
+# Add library
 add_library(${PROJECT_NAME} SHARED ${ANALYTICAL_ENGINE_FRAME_DIR}/app_frame.cc)
-target_compile_definitions(${PROJECT_NAME} PRIVATE _GRAPH_TYPE=gs::ArrowProjectedFragment<int64_t,uint64_t,grape::EmptyType,grape::EmptyType>
-																									 _GRAPH_HEADER=core/fragment/arrow_projected_fragment.h
-                                                   _APP_TYPE=gs::Hello<_GRAPH_TYPE> _APP_HEADER=${CMAKE_CURRENT_SOURCE_DIR}/src/vertex_data/hello.h)
-# target_include_directories(${FRAME_NAME} PRIVATE utils apps)
+target_compile_definitions(
+  ${PROJECT_NAME} PRIVATE
+  _GRAPH_TYPE=gs::ArrowProjectedFragment<int64_t,uint64_t,grape::EmptyType,grape::EmptyType>
+	_GRAPH_HEADER=core/fragment/arrow_projected_fragment.h
+  _APP_TYPE=gs::Hello<_GRAPH_TYPE> _APP_HEADER=${CMAKE_CURRENT_SOURCE_DIR}/src/vertex_data/hello.h
+)
 set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "-fPIC")
 
 if (OpenMP_FOUND)
     target_link_libraries(${PROJECT_NAME} OpenMP::OpenMP_CXX)
 endif ()
+
+# Package applications as graphscope-recognized resource
+add_custom_target(
+  vertex_data
+  COMMAND python3 ${PROJECT_SOURCE_DIR}/script/package.py ${CMAKE_CURRENT_SOURCE_DIR}/src/vertex_data
+  COMMENT "package vertex data application."
+  VERBATIM
+)
