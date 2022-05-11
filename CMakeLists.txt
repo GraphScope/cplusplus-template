@@ -145,6 +145,14 @@ endif ()
 add_custom_target(
   vertex_data
   COMMAND python3 ${PROJECT_SOURCE_DIR}/script/package.py ${CMAKE_CURRENT_SOURCE_DIR}/src/vertex_data
-  COMMENT "package vertex data application."
+  COMMENT "package vertex data app"
+  VERBATIM
+)
+
+# Test
+add_custom_target(
+  test
+  COMMAND python3 -m pytest -s -v ${PROJECT_SOURCE_DIR}/script/test.py
+  COMMENT "run app on graphscope"
   VERBATIM
 )
