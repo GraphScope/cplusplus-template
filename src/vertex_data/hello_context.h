@@ -27,7 +27,11 @@ namespace gs {
  */
 template <typename FRAG_T>
 class HelloContext : public grape::VertexDataContext<FRAG_T, uint64_t> {
-public:
+  using oid_t = typename FRAG_T::oid_t;
+  using vid_t = typename FRAG_T::vid_t;
+  using vertex_t = typename FRAG_T::vertex_t;
+
+ public:
   explicit HelloContext(const FRAG_T &fragment)
       : grape::VertexDataContext<FRAG_T, uint64_t>(fragment, true),
         result(this->data()) {}
@@ -42,6 +46,8 @@ public:
 
   int step = 0;
   int degree = 0;
+
+  typename FRAG_T::template vertex_array_t<uint64_t>& result;
 };
 } // namespace gs
 

@@ -26,12 +26,12 @@ namespace gs {
  * @tparam FRAG_T
  */
 template <typename FRAG_T>
-class Hello : public grape::ParallelAppBase<FRAG_T, KCoreContext<FRAG_T>>,
+class Hello : public grape::ParallelAppBase<FRAG_T, HelloContext<FRAG_T>>,
               public grape::ParallelEngine,
               public grape::Communicator {
 public:
   INSTALL_PARALLEL_WORKER(Hello<FRAG_T>, HelloContext<FRAG_T>, FRAG_T)
-  static constexpr grape::MessageStrategy =
+  static constexpr grape::MessageStrategy message_strategy =
       grape::MessageStrategy::kSyncOnOuterVertex;
   static constexpr grape::LoadStrategy load_strategy =
       grape::LoadStrategy::kBothOutIn;
@@ -51,7 +51,7 @@ public:
     messages.ForceContinue();
   }
 
-  void IncEval(const fragment_t &frag, context_t &context,
+  void IncEval(const fragment_t &fragment, context_t &context,
                message_manager_t &messages) {
     // superstep
     ++context.step;
@@ -60,13 +60,13 @@ public:
     {
       messages.ParallelProcess<fragment_t, double>(
           thread_num(), fragment,
-          [&ctx](int tid, vertex_t u, const double &msg) {
+          [&context](int tid, vertex_t u, const double &msg) {
             // Implement your logic here.
           });
     }
 
     // compute the degree for each vertex
-    auto inner_vertices = frag.InnerVertices();
+    auto inner_vertices = fragment.InnerVertices();
     ForEach(inner_vertices.begin(), inner_vertices.end(),
             [&context, &fragment](int tid, vertex_t u) {
               context.result[u] =
