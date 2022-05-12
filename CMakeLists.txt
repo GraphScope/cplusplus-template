@@ -73,17 +73,24 @@ endif()
 # eliminate a lot of warnings for newer version of boost library.
 add_compile_options(-DBOOST_BIND_GLOBAL_PLACEHOLDERS)
 
-# rpath----------------------------------------------------------------------
+# rpath-----------------------------------------------------------------------
 if (APPLE)
   set(CMAKE_MACOSX_RPATH ON)
 else ()
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath,$ORIGIN")
 endif ()
 
-# TODO find analytical engine home---------------------------------------------
-set(ANALYTICAL_ENGINE_HOME "/usr/local/lib/python3.9/site-packages/graphscope.runtime/")
-message (STATUS "ANALYTICAL_ENGINE_HOME is ${ANALYTICAL_ENGINE_HOME}")
-include("${ANALYTICAL_ENGINE_HOME}/${CMAKE_INSTALL_LIBDIR}/cmake/graphscope-analytical/graphscope-analytical-config.cmake" OPTIONAL)
+# cmake modules----------------------------------------------------------------
+include(${PROJECT_SOURCE_DIR}/cmake/FindGraphScope.cmake)
+
+if (NOT GRAPHSCOPE_FOUND)
+  message(FATAL_ERROR
+    "Module GraphScope not found, try to install by 'pip3 install graphscope' \
+    or set env 'GRAPHSCOPE_HOME' with your existing path")
+endif ()
+
+# find analytical engine ---------------------------------------------
+include("${GRAPHSCOPE_HOME}/${CMAKE_INSTALL_LIBDIR}/cmake/graphscope-analytical/graphscope-analytical-config.cmake" OPTIONAL)
 if("${GRAPHSCOPE_GCC_ABI_BACKWARDS_COMPATIBLE}" STREQUAL "0")
   add_definitions(-D_GLIBCXX_USE_CXX11_ABI=1)
 elseif("${GRAPHSCOPE_GCC_ABI_BACKWARDS_COMPATIBLE}" STREQUAL "1")
@@ -91,14 +98,14 @@ elseif("${GRAPHSCOPE_GCC_ABI_BACKWARDS_COMPATIBLE}" STREQUAL "1")
 endif()
 
 # Include directories----------------------------------------------------------
-include_directories("${ANALYTICAL_ENGINE_HOME}/openmpi/include"
-                    "${ANALYTICAL_ENGINE_HOME}/open-mpi/include"
-                    "${ANALYTICAL_ENGINE_HOME}/include"
-                    "${ANALYTICAL_ENGINE_HOME}/include/vineyard"
-                    "${ANALYTICAL_ENGINE_HOME}/include/graphscope"
-                    "${ANALYTICAL_ENGINE_HOME}/include/graphscope/apps"
-                    "${ANALYTICAL_ENGINE_HOME}/include/graphscope/proto"
-                    "${ANALYTICAL_ENGINE_HOME}/include/grape/analytical_apps")
+include_directories("${GRAPHSCOPE_HOME}/openmpi/include"
+                    "${GRAPHSCOPE_HOME}/open-mpi/include"
+                    "${GRAPHSCOPE_HOME}/include"
+                    "${GRAPHSCOPE_HOME}/include/vineyard"
+                    "${GRAPHSCOPE_HOME}/include/graphscope"
+                    "${GRAPHSCOPE_HOME}/include/graphscope/apps"
+                    "${GRAPHSCOPE_HOME}/include/graphscope/proto"
+                    "${GRAPHSCOPE_HOME}/include/grape/analytical_apps")
 
 # Find Threads------------------------------------------------------------------
 set(CMAKE_THREAD_LIBS_INIT "-lpthread")
@@ -121,7 +128,7 @@ endif ()
 find_package(OpenMP QUIET)
 
 # set frame dir --------------------------------------------------------------------
-set(ANALYTICAL_ENGINE_FRAME_DIR "${ANALYTICAL_ENGINE_HOME}/include/graphscope/frame")
+set(ANALYTICAL_ENGINE_FRAME_DIR "${GRAPHSCOPE_HOME}/include/graphscope/frame")
 
 if (APPLE AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	set(CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS "${CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS} -undefined dynamic_lookup")
@@ -153,6 +160,6 @@ add_custom_target(
 add_custom_target(
   test
   COMMAND python3 -m pytest -s -v ${PROJECT_SOURCE_DIR}/script/test.py
-  COMMENT "run app on graphscope"
+  COMMENT "run and test app on graphscope"
   VERBATIM
 )
