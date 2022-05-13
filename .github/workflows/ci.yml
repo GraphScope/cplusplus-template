@@ -43,7 +43,7 @@ jobs:
 
           GIT_DIFF=$(git diff --ignore-submodules)
           if [[ -n $GIT_DIFF ]]; then
-						echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+            echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
             echo "| clang-format failures found!"
             echo "|"
             echo "$GIT_DIFF" | prepend "| "
