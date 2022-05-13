@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef CPLUSPLUS_TEMPLATE_VERTEX_DATA_HELLO_H_
-#define CPLUSPLUS_TEMPLATE_VERTEX_DATA_HELLO_H_
+#ifndef SRC_VERTEX_DATA_HELLO_H_
+#define SRC_VERTEX_DATA_HELLO_H_
 
 #include "hello_context.h"
 
@@ -29,7 +29,7 @@ template <typename FRAG_T>
 class Hello : public grape::ParallelAppBase<FRAG_T, HelloContext<FRAG_T>>,
               public grape::ParallelEngine,
               public grape::Communicator {
-public:
+ public:
   INSTALL_PARALLEL_WORKER(Hello<FRAG_T>, HelloContext<FRAG_T>, FRAG_T)
   static constexpr grape::MessageStrategy message_strategy =
       grape::MessageStrategy::kSyncOnOuterVertex;
@@ -44,28 +44,28 @@ public:
    * @param context
    * @param messages
    */
-  void PEval(const fragment_t &fragment, context_t &context,
-             message_manager_t &messages) {
+  void PEval(const fragment_t& fragment, context_t& context,
+             message_manager_t& messages) {
     messages.InitChannels(thread_num());
-    // TODO: Implement your partial evaluation here
+    // Implement your partial evaluation here
     messages.ForceContinue();
   }
 
-  void IncEval(const fragment_t &fragment, context_t &context,
-               message_manager_t &messages) {
+  void IncEval(const fragment_t& fragment, context_t& context,
+               message_manager_t& messages) {
     // superstep
     ++context.step;
 
-    // TODO: Process received messages sent by other fragment here.
+    // Process received messages sent by other fragment here.
     {
       messages.ParallelProcess<fragment_t, double>(
           thread_num(), fragment,
-          [&context](int tid, vertex_t u, const double &msg) {
+          [&context](int tid, vertex_t u, const double& msg) {
             // Implement your logic here.
           });
     }
 
-    // compute the degree for each vertex
+    // Compute the degree for each vertex
     auto inner_vertices = fragment.InnerVertices();
     ForEach(inner_vertices.begin(), inner_vertices.end(),
             [&context, &fragment](int tid, vertex_t u) {
@@ -75,6 +75,6 @@ public:
             });
   }
 };
-}; // namespace gs
+};  // namespace gs
 
-#endif // CPLUSPLUS_TEMPLATE_VERTEX_DATA_HELLO_H_
+#endif  // SRC_VERTEX_DATA_HELLO_H_

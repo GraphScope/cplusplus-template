@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef CPLUSPLUS_TEMPLATE_VERTEX_DATA_HELLO_CONTEXT_H_
-#define CPLUSPLUS_TEMPLATE_VERTEX_DATA_HELLO_CONTEXT_H_
+#ifndef SRC_VERTEX_DATA_HELLO_CONTEXT_H_
+#define SRC_VERTEX_DATA_HELLO_CONTEXT_H_
 
 #include "grape/grape.h"
 
@@ -22,6 +22,8 @@ namespace gs {
 
 /**
  * @brief Vertex Data Context for "Hello" Application.
+ *
+ * 'Context' class used to record the intermediate data of each iteration.
  *
  * @tparam FRAG_T
  */
@@ -32,11 +34,16 @@ class HelloContext : public grape::VertexDataContext<FRAG_T, uint64_t> {
   using vertex_t = typename FRAG_T::vertex_t;
 
  public:
-  explicit HelloContext(const FRAG_T &fragment)
+  explicit HelloContext(const FRAG_T& fragment)
       : grape::VertexDataContext<FRAG_T, uint64_t>(fragment, true),
         result(this->data()) {}
 
-  void Init(grape::ParallelMessageManager &messages, int degree) {
+  /**
+   * @param degree: algorithm specific parameter, such as
+   *                "source vertex" for SSSP (single source shortest path)
+   *                "delta, max_round" for Pagerank
+   */
+  void Init(grape::ParallelMessageManager& messages, int degree) {
     // record current superstep
     this->step = 0;
     this->degree = degree;
@@ -44,11 +51,14 @@ class HelloContext : public grape::VertexDataContext<FRAG_T, uint64_t> {
     result.SetValue(0);
   }
 
+  // current superstep
   int step = 0;
+  // algorithm specific parameter
   int degree = 0;
 
+  // result for each vertex, with 'uint64_t' type
   typename FRAG_T::template vertex_array_t<uint64_t>& result;
 };
-} // namespace gs
+}  // namespace gs
 
-#endif // CPLUSPLUS_TEMPLATE_VERTEX_DATA_HELLO_CONTEXT_H_
+#endif  // SRC_VERTEX_DATA_HELLO_CONTEXT_H_

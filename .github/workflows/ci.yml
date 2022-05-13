@@ -20,9 +20,47 @@ concurrency:
 
 jobs:
   build:
-    runs-on: [ubuntu-20.04, macos-10.15]
+    strategy:
+      matrix:
+        os: [ubuntu-20.04, macos-10.15]
     steps:
       - uses: actions/checkout@v2.3.2
+
+      - name: Cpp Format and Lint Check
+        if: matrix.os == 'ubuntu-20.04'
+        run: |
+          # install clang-format
+          sudo curl -L https://github.com/muttleyxd/clang-tools-static-binaries/releases/download/master-22538c65/clang-format-8_linux-amd64 --output /usr/bin/clang-format
+          sudo chmod +x /usr/bin/clang-format
+
+          # run format
+          cd ${GITHUB_WORKSPACE}
+          find ./src  -name "*.h" | xargs clang-format -i --style=file
+          # find ./src -name "*.cc" | xargs clang-format -i --style=file
+
+          # validate format
+          function prepend() { while read line; do echo "${1}${line}"; done; }
+
+          GIT_DIFF=$(git diff --ignore-submodules)
+          if [[ -n $GIT_DIFF ]]; then
+						echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+            echo "| clang-format failures found!"
+            echo "|"
+            echo "$GIT_DIFF" | prepend "| "
+            echo "|"
+            echo "| Run: "
+            echo "|"
+            echo "|    make clformat"
+            echo "|"
+            echo "| to fix this error."
+            echo "|"
+            echo "| Ensure you are working with clang-format-8, which can be obtained from"
+            echo "|"
+            echo "|    https://github.com/muttleyxd/clang-tools-static-binaries/releases"
+            echo "|"
+            echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+            exit -1
+          fi
 
       - name: Install GraphScope
         run: |

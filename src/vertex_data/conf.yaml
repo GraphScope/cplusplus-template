@@ -1,3 +1,13 @@
+# configuration for application
+#
+#   algo: <name for algorithm>
+#   type: 'cpp_pie', DO NOT MODIFY!
+#   class_name: <consistent with 'hello.h'>
+#   src: <source file>
+#   context_type: 'vertex_data', DO NOT MODIFY!
+#   compatible_graph: DO NOT MODIFY!
+#     - gs::ArrowProjectedFragment
+#     - gs::DynamicProjectedFragment
 app:
 - algo: vertex_data_hello
   type: cpp_pie

@@ -148,11 +148,28 @@ if (OpenMP_FOUND)
     target_link_libraries(${PROJECT_NAME} OpenMP::OpenMP_CXX)
 endif ()
 
+# Cpplint
+file(GLOB_RECURSE FILES_NEED_LINT
+     "src/*.h"
+     "src/*.cc")
+add_custom_target(
+  cpplint
+  COMMAND python3 ${PROJECT_SOURCE_DIR}/script/cpplint.py ${FILES_NEED_LINT}
+  COMMENT "running cpplint check."
+  VERBATIM
+)
+add_custom_target(
+  clformat
+  COMMAND clang-format --style=file -i ${FILES_NEED_LINT}
+  COMMENT "Running clang-format, using clang-format-8 from https://github.com/muttleyxd/clang-tools-static-binaries/releases"
+  VERBATIM
+)
+
 # Package applications as graphscope-recognized resource
 add_custom_target(
   vertex_data
   COMMAND python3 ${PROJECT_SOURCE_DIR}/script/package.py ${CMAKE_CURRENT_SOURCE_DIR}/src/vertex_data
-  COMMENT "package vertex data app"
+  COMMENT "Packaging vertex data app."
   VERBATIM
 )
 
@@ -160,6 +177,6 @@ add_custom_target(
 add_custom_target(
   test
   COMMAND python3 -m pytest -s -v ${PROJECT_SOURCE_DIR}/script/test.py
-  COMMENT "run and test app on graphscope"
+  COMMENT "running and testing app on graphscope."
   VERBATIM
 )
