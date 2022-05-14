@@ -65,7 +65,7 @@ jobs:
 
       - name: Install GraphScope
         run: |
-          pip3 install graphscope pytest
+          pip3 install graphscope pytest --user
 
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
