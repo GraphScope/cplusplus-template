@@ -85,12 +85,23 @@ endif ()
 
 # or set GRPAHSCOPE_HOME with: site-packages/graphscope.runtime 
 if ("${GRAPHSCOPE_HOME}" STREQUAL "")
+  # find graphscope from per user site-packages directory (PEP 370)
   execute_process(
-    COMMAND "${Python_EXECUTABLE}" -c "from distutils import sysconfig as sc;print(sc.get_python_lib())"
+    COMMAND "${Python_EXECUTABLE}" -m site --user-site
     OUTPUT_VARIABLE PYTHON_SITE_DIR
     OUTPUT_STRIP_TRAILING_WHITESPACE
   )
-  set(GRAPHSCOPE_HOME "${PYTHON_SITE_DIR}/graphscope.runtime") 
+  set(GRAPHSCOPE_HOME "${PYTHON_SITE_DIR}/graphscope.runtime")
+
+  if (NOT EXISTS "${GRAPHSCOPE_HOME}")
+    # find graphscope from global site-packages
+    execute_process(
+      COMMAND "${Python_EXECUTABLE}" -c "from distutils import sysconfig as sc;print(sc.get_python_lib())"
+      OUTPUT_VARIABLE PYTHON_SITE_DIR
+      OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    set(GRAPHSCOPE_HOME "${PYTHON_SITE_DIR}/graphscope.runtime")
+  endif ()
 endif ()
 
 graphscope_find_package(GRAPHSCOPE "${GRAPHSCOPE_HOME}" graphscope/core/config.h)
