@@ -67,6 +67,10 @@ jobs:
         run: |
           pip3 install graphscope pytest
 
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        if: true
+
       - name: Build Libraries
         run: |
           cd ${GITHUB_WORKSPACE}

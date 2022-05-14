@@ -47,8 +47,6 @@ def p2p_projected_graph(p2p_property_graph):
 
 
 def test_vertex_data_app(p2p_projected_graph):
-    print(os.path.join(os.getcwd(), "vertex_data.gar"))
     app = load_app(os.path.join(os.getcwd(), "vertex_data.gar"))
     ctx = app(p2p_projected_graph, 10)
-    r = ctx.to_numpy("r")
-    print(r)
+    print(ctx.to_numpy("r"))
