@@ -66,10 +66,13 @@ jobs:
       - name: Install GraphScope
         run: |
           pip3 install graphscope pytest --user
+          # fixes temporary, remove after next release of graphscope(v0.14.0)
+          pip3 install "protobuf>=3.15.0,<3.19.0" --user
+          pip3 show protobuf
 
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
-        if: true
+        if: false
 
       - name: Build Libraries
         run: |
