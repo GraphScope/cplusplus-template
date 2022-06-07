@@ -1,4 +1,4 @@
-C++ Library Template for GraphScope
+# ⚙️  C++ Library Template for GraphScope
 
 Use this template as an example to build your own c++ application and run on GraphScope cluster! For more detail about the [Analytical Engine](https://graphscope.io/docs/analytics_engine.html), please visit the [API Doc](https://graphscope.io/docs/reference/analytical_engine_index.html#).
 
@@ -20,15 +20,15 @@ make test_vertex_degree    # run and test app on graphscope
 ```
 
 ### Develop Your Own Application
-- Step-1: Create a new directory under the `src` directory.
+**Step-1: Create a new directory under the `src` directory.**
 ```bash
 cd <repo-name>/src && mkdir my_algo && cd my_algo
 ```
 
-- Step-2: Implement your algorithm under the directory created in 'step-1' like `vertex_degree`
-    - `my_algo_context.h`: Used to record the result or the intermediate data of each iteration of the algorithm
-    - `my_algo.h`: Implement your algorithm logic here
-    - `CMakeLists.txt`: Add your algorithm as a graphscope application.
+**Step-2: Implement your algorithm under the directory created in 'step-1' like `vertex_degree`**
+- `my_algo_context.h`: Used to record the result or the intermediate data of each iteration of the algorithm
+- `my_algo.h`: Implement your algorithm logic here
+- `CMakeLists.txt`: Add your algorithm as a graphscope application.
 
 ```bash
 # my_algo_context.h
@@ -72,10 +72,11 @@ class MyAlgorithm : public grape::ParallelAppBase<FRAG_T, MyAlgorithmContext<FRA
 ```bash
 # CMakeLists.txt
 # add_graphscope_app(<algo_name> <class_name> <subdirectory> <source_file>)
+
 add_graphscope_app(my_algo gs::MyAlgorithm src/my_algo my_algo.h)
 ```
 
-- step-3 build and test your application
+**step-3 build and test your application**
 ```bash
 cd <repo-name> && make -p build && cd build && cmake ..
 make -j && make package_my_algo && make test_my_algo
