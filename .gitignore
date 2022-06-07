@@ -2,3 +2,10 @@
 __pycache__/
 # C++
 build/
+# Format
+cpplint.py
+.clang-format
+# GraphScope
+.gs_conf.yaml
+# Debug
+src/vertex_degree_two

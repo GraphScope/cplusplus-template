@@ -46,7 +46,7 @@ def p2p_projected_graph(p2p_property_graph):
     del graph
 
 
-def test_vertex_data_app(p2p_projected_graph):
-    app = load_app(os.path.join(os.getcwd(), "vertex_data.gar"))
+def test_vertex_degree_app(name, p2p_projected_graph):
+    app = load_app(os.path.join(os.getcwd(), "{0}.gar".format(name)))
     ctx = app(p2p_projected_graph, 10)
     print(ctx.to_numpy("r"))

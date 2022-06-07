@@ -13,10 +13,10 @@
  * limitations under the License.
  */
 
-#ifndef SRC_VERTEX_DATA_HELLO_H_
-#define SRC_VERTEX_DATA_HELLO_H_
+#ifndef VERTEX_DEGREE_H_
+#define VERTEX_DEGREE_H_
 
-#include "hello_context.h"
+#include "vertex_degree_context.h"
 
 namespace gs {
 
@@ -26,11 +26,11 @@ namespace gs {
  * @tparam FRAG_T
  */
 template <typename FRAG_T>
-class Hello : public grape::ParallelAppBase<FRAG_T, HelloContext<FRAG_T>>,
+class VertexDegree : public grape::ParallelAppBase<FRAG_T, VertexDegreeContext<FRAG_T>>,
               public grape::ParallelEngine,
               public grape::Communicator {
  public:
-  INSTALL_PARALLEL_WORKER(Hello<FRAG_T>, HelloContext<FRAG_T>, FRAG_T)
+  INSTALL_PARALLEL_WORKER(VertexDegree<FRAG_T>, VertexDegreeContext<FRAG_T>, FRAG_T)
   static constexpr grape::MessageStrategy message_strategy =
       grape::MessageStrategy::kSyncOnOuterVertex;
   static constexpr grape::LoadStrategy load_strategy =
@@ -47,7 +47,8 @@ class Hello : public grape::ParallelAppBase<FRAG_T, HelloContext<FRAG_T>>,
   void PEval(const fragment_t& fragment, context_t& context,
              message_manager_t& messages) {
     messages.InitChannels(thread_num());
-    // Implement your partial evaluation here
+    // Implement your partial evaluation here.
+    // We put all compute logic in IncEval phase, thus do nothing but force continue.
     messages.ForceContinue();
   }
 
@@ -65,7 +66,7 @@ class Hello : public grape::ParallelAppBase<FRAG_T, HelloContext<FRAG_T>>,
           });
     }
 
-    // Compute the degree for each vertex
+    // Compute the degree for each vertex, set the result in context
     auto inner_vertices = fragment.InnerVertices();
     ForEach(inner_vertices.begin(), inner_vertices.end(),
             [&context, &fragment](int tid, vertex_t u) {
@@ -77,4 +78,4 @@ class Hello : public grape::ParallelAppBase<FRAG_T, HelloContext<FRAG_T>>,
 };
 };  // namespace gs
 
-#endif  // SRC_VERTEX_DATA_HELLO_H_
+#endif  // VERTEX_DEGREE_H_

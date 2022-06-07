@@ -16,25 +16,16 @@
 # limitations under the License.
 #
 
-import glob
-import itertools
-import os
-import sys
-import zipfile
-
-DEFAULT_GS_CONFIG_FILE = ".gs_conf.yaml"
+import pytest
 
 
-def package_app(app_dir):
-    app_name = os.path.basename(app_dir)
-    with zipfile.ZipFile(app_name + ".gar", "w") as gar:
-        for filename in itertools.chain(
-            glob.glob(os.path.join(app_dir, "*.h")),
-            glob.glob(os.path.join(app_dir, "*.cc")),
-        ):
-            gar.write(filename, os.path.basename(filename))
-        gar.write(os.path.join(app_dir, "conf.yaml"), DEFAULT_GS_CONFIG_FILE)
+def pytest_addoption(parser):
+    parser.addoption("--name", action="store")
 
 
-if __name__ == "__main__":
-    package_app(sys.argv[1])
+@pytest.fixture(scope="session")
+def name(request):
+    name_value = request.config.option.name
+    if name_value is None:
+        pytest.skip()
+    return name_value

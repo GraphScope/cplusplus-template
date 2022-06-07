@@ -13,28 +13,28 @@
  * limitations under the License.
  */
 
-#ifndef SRC_VERTEX_DATA_HELLO_CONTEXT_H_
-#define SRC_VERTEX_DATA_HELLO_CONTEXT_H_
+#ifndef VERTEX_DEGREE_CONTEXT_H_
+#define VERTEX_DEGREE_CONTEXT_H_
 
 #include "grape/grape.h"
 
 namespace gs {
 
 /**
- * @brief Vertex Data Context for "Hello" Application.
+ * @brief Context for "VertexDegree" Application.
  *
  * 'Context' class used to record the intermediate data of each iteration.
  *
  * @tparam FRAG_T
  */
 template <typename FRAG_T>
-class HelloContext : public grape::VertexDataContext<FRAG_T, uint64_t> {
+class VertexDegreeContext : public grape::VertexDataContext<FRAG_T, uint64_t> {
   using oid_t = typename FRAG_T::oid_t;
   using vid_t = typename FRAG_T::vid_t;
   using vertex_t = typename FRAG_T::vertex_t;
 
  public:
-  explicit HelloContext(const FRAG_T& fragment)
+  explicit VertexDegreeContext(const FRAG_T& fragment)
       : grape::VertexDataContext<FRAG_T, uint64_t>(fragment, true),
         result(this->data()) {}
 
@@ -61,4 +61,4 @@ class HelloContext : public grape::VertexDataContext<FRAG_T, uint64_t> {
 };
 }  // namespace gs
 
-#endif  // SRC_VERTEX_DATA_HELLO_CONTEXT_H_
+#endif  // VERTEX_DEGREE_CONTEXT_H_
