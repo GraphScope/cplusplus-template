@@ -33,6 +33,13 @@ cd <repo-name>/src && mkdir my_algo && cd my_algo
 ```bash
 # my_algo_context.h
 
+#ifndef MY_ALGORITHM_CONTEXT_H_
+#define MY_ALGORITHM_CONTEXT_H_
+
+#include "grape/grape.h"
+
+namespace gs {
+
 template <typename FRAG_T>
 class MyAlgorithmContext : public grape::VertexDataContext<FRAG_T, uint64_t> {
  public:
@@ -40,33 +47,66 @@ class MyAlgorithmContext : public grape::VertexDataContext<FRAG_T, uint64_t> {
       : grape::VertexDataContext<FRAG_T, uint64_t>(fragment, true),
         result(this->data()) {}
 
-  void Init(grape::ParallelMessageManager& messages) {
+  void Init(grape::ParallelMessageManager& messages, int param) {
     // initialize parameters and result of algorithm here.
+    this->param = param;
     result.SetValue(0);
   }
 
+  // algorithm specific parameter
+  int param = 0;
+  // result for each vertex, with 'uint64_t' type
   typename FRAG_T::template vertex_array_t<uint64_t>& result;
 };
+
+}  // namespace gs
+
+#endif  // MY_ALGORITHM_CONTEXT_H_
 ```
 
 
 ```bash
 # my_algo.h
 
+#ifndef MY_ALGORITHM_H_
+#define MY_ALGORITHM_H_
+
+#include "my_algo_context.h"
+
+namespace gs {
+
 template <typename FRAG_T>
 class MyAlgorithm : public grape::ParallelAppBase<FRAG_T, MyAlgorithmContext<FRAG_T>>,
               public grape::ParallelEngine,
               public grape::Communicator {
  public:
+  INSTALL_PARALLEL_WORKER(MyAlgorithm<FRAG_T>, MyAlgorithmContext<FRAG_T>, FRAG_T)
+  static constexpr grape::MessageStrategy message_strategy =
+      grape::MessageStrategy::kSyncOnOuterVertex;
+  static constexpr grape::LoadStrategy load_strategy =
+      grape::LoadStrategy::kBothOutIn;
+
+  /*
+   * @brief Implement your partial evaluation here.
+   */
   void PEval(const fragment_t& fragment, context_t& context,
              message_manager_t& messages) {
-    // Implement your partial evaluation here.
+    LOG(INFO) << "PEval...";
+    messages.ForceContinue();
   }
+
+  /**
+   * @brief Implement your incremental evaluation here.
+   */
   void IncEval(const fragment_t& fragment, context_t& context,
                message_manager_t& messages) {
-    // Implement your incremental evaluation here.
+    LOG(INFO) << "IncEval...";
   }
 };
+
+}  // namespace gs
+
+#endif  // MY_ALGORITHM_H_
 ```
 
 ```bash
@@ -78,8 +118,8 @@ add_graphscope_app(my_algo gs::MyAlgorithm src/my_algo my_algo.h)
 
 **step-3 build and test your application**
 ```bash
-cd <repo-name> && make -p build && cd build && cmake ..
-make -j && make package_my_algo && make test_my_algo
+cd build && cmake ..
+make package_my_algo && make test_my_algo
 ```
 
 ### Code Base Explained
