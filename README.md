@@ -95,7 +95,7 @@ class MyAlgorithm : public grape::ParallelAppBase<FRAG_T, MyAlgorithmContext<FRA
     messages.ForceContinue();
   }
 
-  /**
+  /*
    * @brief Implement your incremental evaluation here.
    */
   void IncEval(const fragment_t& fragment, context_t& context,
