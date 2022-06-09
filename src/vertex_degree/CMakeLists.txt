@@ -1,1 +1,1 @@
-add_graphscope_app(vertex_degree gs::VertexDegree src/vertex_degree vertex_degree.h)
+add_graphscope_app(vertex_degree gs::VertexDegree vertex_degree.h)

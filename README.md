@@ -111,9 +111,9 @@ class MyAlgorithm : public grape::ParallelAppBase<FRAG_T, MyAlgorithmContext<FRA
 
 ```bash
 # CMakeLists.txt
-# add_graphscope_app(<algo_name> <class_name> <subdirectory> <source_file>)
+# add_graphscope_app(<algo_name> <class_name> <source_file>)
 
-add_graphscope_app(my_algo gs::MyAlgorithm src/my_algo my_algo.h)
+add_graphscope_app(my_algo gs::MyAlgorithm my_algo.h)
 ```
 
 **step-3 build and test your application**

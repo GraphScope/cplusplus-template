@@ -135,7 +135,7 @@ if (APPLE AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 endif()
 
 # Add GraphScope application
-function(add_graphscope_app name class_name directory source_file)
+function(add_graphscope_app name class_name source_file)
   set(library_name ${PROJECT_NAME}_${name})
   add_library(${library_name} SHARED ${ANALYTICAL_ENGINE_FRAME_DIR}/app_frame.cc)
   target_compile_definitions(
