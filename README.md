@@ -15,111 +15,35 @@ git clone https://github.com/<username>/<repo-name>.git
 cd <repo-name>
 mkdir build && cd build    # with example algorithm: vertex_degree
 cmake .. && make -j4       # build dynamic library
-make package_vertex_degree # package 'vertex_degree' as graphscope-recognized resource
-make test_vertex_degree    # run and test app on graphscope
+make package               # package as a graphscope-recognized resource (.gar)
+make test                  # run and test app on graphscope
 ```
 
 ### Develop Your Own Application
-**Step-1: Create a new directory under the `src` directory.**
-```bash
-cd <repo-name>/src && mkdir my_algo && cd my_algo
-```
 
-**Step-2: Implement your algorithm under the directory created in 'step-1' like `vertex_degree`**
-- `my_algo_context.h`: Used to record the result or the intermediate data of each iteration of the algorithm
-- `my_algo.h`: Implement your algorithm logic here
-- `CMakeLists.txt`: Add your algorithm as a graphscope application.
+**Step-1: Modify the file under the `src` directory and implement your own algorithm logic**
+- `my_app_context.h`: Used to record the result or the intermediate data of each iteration of the algorithm
+- `my_app.h`: Implement your algorithm logic here
 
-```bash
-# my_algo_context.h
-
-#ifndef MY_ALGORITHM_CONTEXT_H_
-#define MY_ALGORITHM_CONTEXT_H_
-
-#include "grape/grape.h"
-
-namespace gs {
-
-template <typename FRAG_T>
-class MyAlgorithmContext : public grape::VertexDataContext<FRAG_T, uint64_t> {
- public:
-  explicit MyAlgorithmContext(const FRAG_T& fragment)
-      : grape::VertexDataContext<FRAG_T, uint64_t>(fragment, true),
-        result(this->data()) {}
-
-  void Init(grape::ParallelMessageManager& messages, int param) {
-    // initialize parameters and result of algorithm here.
-    this->param = param;
-    result.SetValue(0);
-  }
-
-  // algorithm specific parameter
-  int param = 0;
-  // result for each vertex, with 'uint64_t' type
-  typename FRAG_T::template vertex_array_t<uint64_t>& result;
-};
-
-}  // namespace gs
-
-#endif  // MY_ALGORITHM_CONTEXT_H_
-```
-
-
-```bash
-# my_algo.h
-
-#ifndef MY_ALGORITHM_H_
-#define MY_ALGORITHM_H_
-
-#include "my_algo_context.h"
-
-namespace gs {
-
-template <typename FRAG_T>
-class MyAlgorithm : public grape::ParallelAppBase<FRAG_T, MyAlgorithmContext<FRAG_T>>,
-              public grape::ParallelEngine,
-              public grape::Communicator {
- public:
-  INSTALL_PARALLEL_WORKER(MyAlgorithm<FRAG_T>, MyAlgorithmContext<FRAG_T>, FRAG_T)
-  static constexpr grape::MessageStrategy message_strategy =
-      grape::MessageStrategy::kSyncOnOuterVertex;
-  static constexpr grape::LoadStrategy load_strategy =
-      grape::LoadStrategy::kBothOutIn;
-
-  /*
-   * @brief Implement your partial evaluation here.
-   */
-  void PEval(const fragment_t& fragment, context_t& context,
-             message_manager_t& messages) {
-    LOG(INFO) << "PEval...";
-    messages.ForceContinue();
-  }
-
-  /*
-   * @brief Implement your incremental evaluation here.
-   */
-  void IncEval(const fragment_t& fragment, context_t& context,
-               message_manager_t& messages) {
-    LOG(INFO) << "IncEval...";
-  }
-};
-
-}  // namespace gs
-
-#endif  // MY_ALGORITHM_H_
-```
-
-```bash
-# CMakeLists.txt
-# add_graphscope_app(<algo_name> <class_name> <source_file>)
-
-add_graphscope_app(my_algo gs::MyAlgorithm my_algo.h)
-```
-
-**step-3 build and test your application**
+**step-2: build and test your application**
 ```bash
 cd build && cmake ..
-make package_my_algo && make test_my_algo
+make package && make test
+```
+**Step-3: Run the GAR resource on GraphScope**
+```python3
+import graphscope
+
+from graphscope.framework.app import load_app
+from graphscope.dataset import load_p2p_network
+
+sess = graphscope.session(cluster_type="hosts")
+simple_graph = load_p2p_network(sess)._project_to_simple()
+
+my_app = load_app('<path_to_your_gar_resource>')
+context = my_app(simple_graph, 10)  # pass 10 as param1 defined in 'MyAppContext.h'
+
+print(context.to_numpy('r'))
 ```
 
 ### Code Base Explained
@@ -130,8 +54,6 @@ Very simple directory structure, add your source files to `src`. We provide an e
 ├── FindGraphScope.cmake ➝ Fetch and find graphscope module
 ├── README.md
 └── src
-    ├── vertex_degree
-        ├── CMakeLists.txt ➝ add ylgorithm as a graphscope application
-        ├── vertex_degree_context.h ➝ context definition used by algorithm
-        └── vertex_degree.h ➝ algorithm definition
+    ├── my_app_context.h ➝ context definition used by algorithm
+    └── my_apph ➝ algorithm definition
 ```

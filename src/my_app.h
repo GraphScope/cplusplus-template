@@ -13,10 +13,10 @@
  * limitations under the License.
  */
 
-#ifndef VERTEX_DEGREE_H_
-#define VERTEX_DEGREE_H_
+#ifndef MY_APP_H
+#define MY_APP_H
 
-#include "vertex_degree_context.h"
+#include "my_app_context.h"
 
 namespace gs {
 
@@ -26,11 +26,11 @@ namespace gs {
  * @tparam FRAG_T
  */
 template <typename FRAG_T>
-class VertexDegree : public grape::ParallelAppBase<FRAG_T, VertexDegreeContext<FRAG_T>>,
+class MyApp : public grape::ParallelAppBase<FRAG_T, MyAppContext<FRAG_T>>,
               public grape::ParallelEngine,
               public grape::Communicator {
  public:
-  INSTALL_PARALLEL_WORKER(VertexDegree<FRAG_T>, VertexDegreeContext<FRAG_T>, FRAG_T)
+  INSTALL_PARALLEL_WORKER(MyApp<FRAG_T>, MyAppContext<FRAG_T>, FRAG_T)
   static constexpr grape::MessageStrategy message_strategy =
       grape::MessageStrategy::kSyncOnOuterVertex;
   static constexpr grape::LoadStrategy load_strategy =
@@ -78,4 +78,4 @@ class VertexDegree : public grape::ParallelAppBase<FRAG_T, VertexDegreeContext<F
 };
 };  // namespace gs
 
-#endif  // VERTEX_DEGREE_H_
+#endif  // MY_APP_H
