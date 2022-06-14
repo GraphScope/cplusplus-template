@@ -12,7 +12,7 @@ Please note that this template is designed for applications with **a scalar resu
 pip3 install graphscope 
 ```
 
-### Step 2. Use this template to develop app with your own logics
+### Step 2. Use this template to develop your own application
 
 Click "Use this template" button up-right.t to create your own repository, clone it to local.
 
@@ -38,7 +38,7 @@ cmake .. && make            # build the application.
 make package                # package as a graphscope-recognized resource (.gar)
 make test                   # run a simple test. 
 ```
-### Step 4. How to run `.gar` file on GraphScope GAR
+### Step 4. How to run `.gar` file on GraphScope
 
 Here is an example to run the packaged gar file in GraphScope Python interface.
 
@@ -65,8 +65,9 @@ In the `src` folder, we provide a simple example of `vertex_data`, which ...TODO
 ├── FindGraphScope.cmake ➝  find graphscope module
 ├── README.md
 └── src
-    ├── my_app_context.h ➝ context definition used by algorithm
-    └── my_app.h ➝ algorithm definition
+    ├── my_app.h ➝ algorithm logics
+    └── my_app_context.h ➝ context with auxiliary data for the algorithm
+
 ```
 
 ## Useful Links
