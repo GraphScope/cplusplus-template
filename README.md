@@ -60,7 +60,7 @@ print(result.to_numpy('r'))
 ```
 
 ## Codebase Explained
-In the `src` folder, we provide a simple example of `vertex_data`, which ...TODO(lidongze)
+In the `src` folder, we provide a simple example of `my_app`, which computing the degree for each vertex.
 ```
 .
 ├── CMakeLists.txt
