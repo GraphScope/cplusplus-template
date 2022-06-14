@@ -1,5 +1,7 @@
 # ⚙️  C++ Application Template for GraphScope
 
+[![C++ Library Template CI](https://github.com/GraphScope/cpp-template/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/GraphScope/cpp-template/actions/workflows/ci.yml)
+
 Use this template repo as an example to build your own C++ application and run on GraphScope! 
 
 Please note that this template is designed for applications with **a scalar result for each vertex**, e.g. the `rank value` on each vertex for [PageRank algorithm](https://en.wikipedia.org/wiki/PageRank).
