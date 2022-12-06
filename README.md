@@ -48,15 +48,19 @@ Here is an example to run the packaged gar file in GraphScope Python interface.
 import graphscope
 
 from graphscope.framework.app import load_app
-from graphscope.dataset import load_p2p_network
+g = graphscope.g(directed=False, generate_eid=False, vertex_map="local")
+g = g.add_edges(
+    f"/Users/siyuan/CLionProjects/gstest/property/p2p-31_property_e_0",
+    label="knows",
+    src_label="person",
+    dst_label="person",
+)
 
-sess = graphscope.session()
-simple_graph = load_p2p_network(sess)._project_to_simple()
+my_app = load_app('/Users/siyuan/CLionProjects/cpp-template/build/my_app.gar')
+result = my_app(g, src=1)
 
-my_app = load_app('<path_to_your_gar_resource>')
-result = my_app(simple_graph, 10)  # pass 10 as param1 defined in 'MyAppContext.h'
-
-print(result.to_numpy('r'))
+df = result.to_dataframe(selector={'id': 'v:person.id', 'r': 'r:person'}).sort_values(by='id')
+print(df)
 ```
 
 ## Codebase Explained
