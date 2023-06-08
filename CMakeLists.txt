@@ -15,9 +15,35 @@ if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif ()
 
 # cmake cxx standard---------------------------------------------------------
-set(CMAKE_CXX_STANDARD 14)
+include(CheckCXXCompilerFlag)
+CHECK_CXX_COMPILER_FLAG("-std=c++17" HAS_STDCXX_17)
+if (HAS_STDCXX_17)
+    set(CMAKE_CXX_STANDARD 17)
+else()
+    set(CMAKE_CXX_STANDARD 14)
+endif()
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O0 -g")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
+if (APPLE)
+    set(CMAKE_MACOSX_RPATH ON)
+else ()
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath,$ORIGIN")
+endif ()
+check_cxx_compiler_flag(-Wno-class-memaccess W_NO_CLASS_MEMACCESS)
+check_cxx_compiler_flag(-Wno-redundant-move W_NO_REDUNDANT_MOVE)
+check_cxx_compiler_flag(-Wno-undef-prefix W_NO_UNDEF_PREFIX)
+if(W_NO_CLASS_MEMACCESS)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-class-memaccess")
+endif()
+if(W_NO_REDUNDANT_MOVE)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-redundant-move")
+endif()
+if (W_NO_UNDEF_PREFIX)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-undef-prefix")
+endif()
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -g")
 
 # cmake cxx compiler flags---------------------------------------------------
 check_cxx_compiler_flag(-Wno-deprecated-declarations W_NO_DEPRECATED_DECLARATIONS)
@@ -102,6 +128,7 @@ include_directories("${GRAPHSCOPE_HOME}/openmpi/include"
                     "${GRAPHSCOPE_HOME}/open-mpi/include"
                     "${GRAPHSCOPE_HOME}/include"
                     "${GRAPHSCOPE_HOME}/include/vineyard"
+                    "${GRAPHSCOPE_HOME}/include/vineyard/contrib"
                     "${GRAPHSCOPE_HOME}/include/graphscope"
                     "${GRAPHSCOPE_HOME}/include/graphscope/apps"
                     "${GRAPHSCOPE_HOME}/include/graphscope/proto"
@@ -136,6 +163,8 @@ endif()
 
 # Add GraphScope application
 add_library(${PROJECT_NAME} SHARED ${ANALYTICAL_ENGINE_FRAME_DIR}/app_frame.cc)
+# _GRAPH_TYPE=vineyard::ArrowFragment<int64_t,uint64_t>
+# _GRAPH_HEADER=vineyard/graph/fragment/arrow_fragment.h
 target_compile_definitions(
   ${PROJECT_NAME} PRIVATE
   _GRAPH_TYPE=gs::ArrowProjectedFragment<int64_t,uint64_t,grape::EmptyType,grape::EmptyType>
